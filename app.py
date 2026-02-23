@@ -1,6 +1,9 @@
 #1: Tạo app.py để định nghĩa ban đầu cho trang web và gia sư AI. sử dụng Flask để tạo một ứng dụng web đơn giản, và Google Generative AI để tạo nội dung dựa trên câu hỏi của người dùng.
 
 #Thêm framework Flask và Google Generative AI API vào ứng dụng của trang web
+#Import os để làm việc với các biến môi trường và cấu hình cổng cho ứng dụng Flask.
+import os
+
 from flask import Flask, render_template, request
 import google.generativeai as genai
 app = Flask(__name__) #Tạo một ứng dụng Flask mới
@@ -26,3 +29,7 @@ def ask():
 #Chạy ứng dụng Flask với chế độ debug để dễ dàng phát hiện lỗi và tự động tải lại khi có thay đổi trong mã nguồn.
 if __name__ == "__main__":
     app.run(debug=True)
+    #Lấy cổng từ biến môi trường PORT nếu có, nếu không thì sử dụng cổng mặc định 5000. Điều này cho phép ứng dụng chạy trên các nền tảng đám mây như Heroku, nơi cổng được chỉ định thông qua biến môi trường.
+    port = int(os.environ.get("PORT", 5000))
+    # Host '0.0.0.0' để thế giới bên ngoài có thể kết nối vào
+    app.run(host='0.0.0.0', port=port)
