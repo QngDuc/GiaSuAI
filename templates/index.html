@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
@@ -18,27 +19,97 @@
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <title>Gia sư AI</title>
+    <link rel="stylesheet" href=/static/styles.css>
+    <title>Gia sư AI - Trợ lý học tập thông minh</title>
 </head>
 <body>
-    <h1>Chào mừng đến với Gia sư AI</h1>
-    <p>Đây là trang chủ của ứng dụng gia sư AI..</p>
-    <form id="questionForm">
-        <label for="question">Hãy nhập câu hỏi của bạn:</label><br>
-        <input type="text" id="question" name="user_input" required><br><br>
-        <button type="submit" value="Gửi câu hỏi">Gửi</button>
-    </form>
-    <div id="response"></div>
-    
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap"></i> Gia sư AI
+            </a>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <i class="fas fa-robot"></i> Gia sư AI
+                </h1>
+                <p class="hero-subtitle">Trợ lý học tập thông minh - Sẵn sàng giúp bạn mọi lúc</p>
+                <div class="hero-decoration">
+                    <div class="float-particle"></div>
+                    <div class="float-particle"></div>
+                    <div class="float-particle"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <section class="content-section">
+            <div class="container">
+                <!-- Question Form Card -->
+                <div class="form-container">
+                    <div class="form-card">
+                        <h2 class="form-title">
+                            <i class="fas fa-lightbulb"></i> Hãy đặt câu hỏi của bạn
+                        </h2>
+                        <p class="form-description">Nhập bất kỳ câu hỏi gì và tôi sẽ giúp bạn tìm ra câu trả lời</p>
+                        
+                        <form id="questionForm" class="question-form">
+                            <div class="input-group input-group-lg input-group-custom">
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="question" 
+                                    name="user_input" 
+                                    placeholder="Ví dụ: Phương trình bậc hai là gì?..."
+                                    required
+                                >
+                                <button class="btn btn-primary btn-custom" type="submit">
+                                    <i class="fas fa-paper-plane"></i> Gửi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Response Card -->
+                <div class="response-container" id="responseContainer" style="display: none;">
+                    <div class="response-card">
+                        <div class="response-header">
+                            <h3><i class="fas fa-check-circle"></i> Câu trả lời</h3>
+                            <button class="btn-clear" onclick="clearResponse()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="response" class="response-content"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
     <script>
+        function clearResponse() {
+            document.getElementById('responseContainer').style.display = 'none';
+            document.getElementById('question').value = '';
+            document.getElementById('question').focus();
+        }
+
         document.getElementById('questionForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const userInput = document.getElementById('question').value;
             const responseDiv = document.getElementById('response');
+            const responseContainer = document.getElementById('responseContainer');
             
             // Hiển thị thông báo đang tải
-            responseDiv.innerHTML = '<p>Đang tải phản hồi...</p>';
+            responseDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Đang tải phản hồi...</p></div>';
+            responseContainer.style.display = 'block';
+            responseContainer.scrollIntoView({ behavior: 'smooth' });
             
             // Gửi AJAX request
             fetch('/ask', {
@@ -56,7 +127,7 @@
                 MathJax.typeset();
             })
             .catch(error => {
-                responseDiv.innerHTML = '<p style="color: red;">Lỗi: ' + error + '</p>';
+                responseDiv.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Lỗi: ' + error + '</div>';
             });
         });
     </script>
