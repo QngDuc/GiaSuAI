@@ -7,8 +7,9 @@ import os
 from flask import Flask, render_template, request
 import google.generativeai as genai
 app = Flask(__name__) #Tạo một ứng dụng Flask mới
-genai.configure(api_key="AIzaSyCbDCJ7ZsaOZbmkgg0xc4igz_ZrbgSC3bE") #Cấu hình API key để sử dụng Google Generative AI cho phép truy cập vào Google Generative AI để tạo nội dung dựa trên câu hỏi của người dùng.
-model = genai.GenerativeModel("models/gemini-2.5-flash") #Khởi tạo mô hình GenerativeModel từ Google Generative AI với tên "models/gemini-2.0-pro" 
+api_key = os.environ.get("GEMINI_API_KEY") #Lấy API key từ biến môi trường GEMINI_API_KEY trên Render để sử dụng Google Generative AI
+genai.configure(api_key=api_key) #Cấu hình API key để sử dụng Google Generative AI cho phép truy cập vào Google Generative AI để tạo nội dung dựa trên câu hỏi của người dùng.
+model = genai.GenerativeModel("models/gemini-2.5-flash") #Khởi tạo mô hình GenerativeModel từ Google Generative AI với tên "models/gemini-2.5-flash". Đây là mô hình được sử dụng để tạo nội dung dựa trên câu hỏi của người dùng.
 
 #Hàm định nghĩa hiển thị trang chủ
 @app.route("/")
@@ -28,7 +29,6 @@ def ask():
 
 #Chạy ứng dụng Flask với chế độ debug để dễ dàng phát hiện lỗi và tự động tải lại khi có thay đổi trong mã nguồn.
 if __name__ == "__main__":
-    app.run(debug=True)
     #Lấy cổng từ biến môi trường PORT nếu có, nếu không thì sử dụng cổng mặc định 5000. Điều này cho phép ứng dụng chạy trên các nền tảng đám mây như Heroku, nơi cổng được chỉ định thông qua biến môi trường.
     port = int(os.environ.get("PORT", 5000))
     # Host '0.0.0.0' để thế giới bên ngoài có thể kết nối vào
