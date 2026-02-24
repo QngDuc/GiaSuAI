@@ -3,10 +3,13 @@
 #Thêm framework Flask và Google Generative AI API vào ứng dụng của trang web
 #Import os để làm việc với các biến môi trường và cấu hình cổng cho ứng dụng Flask.
 import os
-
 from flask import Flask, render_template, request
 import google.generativeai as genai
-app = Flask(__name__) #Tạo một ứng dụng Flask mới
+app = Flask(__name__, 
+    static_folder='static',
+    static_url_path='/static',
+    template_folder='templates'
+)
 api_key = os.environ.get("GEMINI_API_KEY") #Lấy API key từ biến môi trường GEMINI_API_KEY trên Render để sử dụng Google Generative AI
 genai.configure(api_key=api_key) #Cấu hình API key để sử dụng Google Generative AI cho phép truy cập vào Google Generative AI để tạo nội dung dựa trên câu hỏi của người dùng.
 model = genai.GenerativeModel("models/gemini-2.5-flash") #Khởi tạo mô hình GenerativeModel từ Google Generative AI với tên "models/gemini-2.5-flash". Đây là mô hình được sử dụng để tạo nội dung dựa trên câu hỏi của người dùng.
