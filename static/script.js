@@ -27,8 +27,19 @@ function clearResponse() {
             const imageFile = document.getElementById('imageUpload').files[0];
             // Nếu người dùng đã chọn một file hình ảnh, thêm nó vào FormData để gửi lên server
             if (imageFile) {
-                // Dùng FormData để thêm file hình ảnh vào formData với tên 'image_file' để server có thể nhận và xử lý nó sau này
-                formData.append('image_file', imageFile);
+                // Kiểm tra loại file (hình ảnh hoặc PDF)
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+                if (!allowedTypes.includes(imageFile.type)) {
+                    alert('Chỉ chấp nhận file hình ảnh (JPEG, PNG, GIF, WebP) hoặc PDF!');
+                    return;
+                }
+                // Kiểm tra kích thước file (max 5MB)
+                if (imageFile.size > 5 * 1024 * 1024) {
+                    alert('Kích thước file không được vượt quá 5MB!');
+                    return;
+                }
+                // Dùng FormData để thêm file hình ảnh vào formData với tên 'file' để server có thể nhận và xử lý nó sau này
+                formData.append('file', imageFile);
             }
             
             // Hiển thị thông báo đang tải
@@ -55,8 +66,6 @@ function clearResponse() {
                 responseDiv.innerHTML = marked.parse(data);
                 // Render MathJax cho công thức toán học
                 MathJax.typeset();
-                // Fixed: Xóa file đã chọn sau khi gửi thành công - sử dụng 'imageUpload' đúng
-                document.getElementById('imageUpload').value = '';
             })
             // Nếu có lỗi xảy ra trong quá trình gửi request hoặc nhận phản hồi, chúng ta sẽ bắt lỗi và hiển thị thông báo lỗi cho người dùng
             .catch(error => {
