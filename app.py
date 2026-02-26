@@ -32,7 +32,7 @@ def ask():
     #Lấy dữ liệu từ form câu hỏi của người dùng thông qua request.form và lưu vào biến user_input
     user_input = request.form["user_input"]
     # Khởi tạo một danh sách để chứa các phần nội dung sẽ gửi đến mô hình Gemini
-    contents = [f"Bạn là một gia sư tận tâm hãy trả lời câu hỏi sau: {user_input}",image_parts]
+    contents = [f"Bạn là một gia sư tận tâm hãy trả lời câu hỏi sau: {user_input}"]
     #Lấy tệp hình ảnh từ form nếu có và lưu vào biến
     file = request.files.get('file')
     # Kiểm tra xem có file hình ảnh nào được tải lên không
