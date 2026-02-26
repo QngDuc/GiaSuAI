@@ -32,7 +32,7 @@ def ask():
     #Lấy dữ liệu từ form câu hỏi của người dùng thông qua request.form và lưu vào biến user_input
     user_input = request.form["user_input"]
     # Khởi tạo một danh sách để chứa các phần nội dung sẽ gửi đến mô hình Gemini
-    contents = [f"Bạn là một gia sư tận tâm hãy trả lời câu hỏi sau: {user_input}"]
+    contents = [f"Bạn là một gia sư tận tâm hãy trả lời câu hỏi sau: {user_input}",image_parts]
     #Lấy tệp hình ảnh từ form nếu có và lưu vào biến
     file = request.files.get('file')
     # Kiểm tra xem có file hình ảnh nào được tải lên không
@@ -45,7 +45,7 @@ def ask():
                     "data": img_data  # Dữ liệu hình ảnh đã đọc
                 }
             ]
-            response = model.generate_content(contents, image_parts=image_parts)  # Gửi cả câu hỏi và hình ảnh đến mô hình Gemini để tạo nội dung
+            response = model.generate_content(contents + image_parts)  # Gửi cả câu hỏi và hình ảnh đến mô hình Gemini để tạo nội dung
             
         else:
             response = model.generate_content(contents)  # Nếu không có hình ảnh, chỉ gửi câu hỏi đến mô hình Gemini để tạo nội dung
@@ -54,8 +54,6 @@ def ask():
     except Exception as e:
         print(f"Error processing request: {e}")
         return "Đã xảy ra lỗi khi xử lý yêu cầu của bạn. Vui lòng thử lại sau."  # Trả về thông báo lỗi cho người dùng nếu có lỗi xảy ra
-
-           
 
     #Gán biến response bằng cách gọi generate_content của mô hình GenerativeModel với câu hỏi của người dùng được truyền vào. Câu hỏi được định dạng để yêu cầu gia sư AI trả lời một cách tận tâm. 
     response = model.generate_content(contents)

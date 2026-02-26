@@ -59,10 +59,6 @@
                         <p class="form-description">Nhập bất kỳ câu hỏi gì và tôi sẽ giúp bạn tìm ra câu trả lời</p>
                         
                         <form id="questionForm" class="question-form" enctype="multipart/form-data">
-                            <div class="mb-3">
-                                <label for="imageUpload" class="form-label">Tải lên hình ảnh (tùy chọn)</label>
-                                <input class="form-control form-control-lg" type="file" id="imageUpload" name="image_file" accept="image/*">
-                            </div>
                             <div class="input-group input-group-lg input-group-custom">
                                 <input 
                                     type="text" 
@@ -72,6 +68,12 @@
                                     placeholder="Ví dụ: Phương trình bậc hai là gì?..."
                                     required
                                 >
+                                <input 
+                                    type="file" 
+                                    name="file"
+                                    id="fileInput"
+                                    class="form-control file-input"
+                                    accept=".pdf,.doc,.docx,.txt,.image/*">
                                 <button class="btn btn-primary btn-custom" type="submit">
                                     <i class="fas fa-paper-plane"></i> Gửi
                                 </button>
