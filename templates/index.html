@@ -68,12 +68,14 @@
                                     placeholder="Ví dụ: Phương trình bậc hai là gì?..."
                                     required
                                 >
+                                <!-- Fixed: Thay đổi id từ 'fileInput' thành 'imageUpload' để khớp với JavaScript -->
+                                <!-- Fixed: Sửa chính xác giá trị accept từ '.image/*' thành 'image/*' -->
                                 <input 
                                     type="file" 
                                     name="file"
-                                    id="fileInput"
+                                    id="imageUpload"
                                     class="form-control file-input"
-                                    accept=".pdf,.doc,.docx,.txt,.image/*">
+                                    accept="image/*,.pdf,.doc,.docx,.txt">
                                 <button class="btn btn-primary btn-custom" type="submit">
                                     <i class="fas fa-paper-plane"></i> Gửi
                                 </button>

@@ -4,6 +4,7 @@ function clearResponse() {
             document.getElementById('responseContainer').style.display = 'none';
             // Lấy phần tử chứa câu hỏi và hình ảnh, đưa giá trị của chúng về mặc định (rỗng) để người dùng có thể nhập câu hỏi mới và chọn hình ảnh mới nếu muốn
             document.getElementById('question').value = '';
+            // Fixed: Sử dụng 'imageUpload' - ID chính xác của input file từ HTML
             document.getElementById('imageUpload').value = '';
             // Lấy phần tử chứa câu hỏi dùng để hiển thị lại và focus vào đó để người dùng có thể nhập câu hỏi mới
             document.getElementById('question').focus();
@@ -22,6 +23,7 @@ function clearResponse() {
             const formData = new FormData();
             // Dùng FormData để lấy giá trị của trường input có id 'question' và gán vào biến userInput
             formData.append('user_input', document.getElementById('question').value);
+            // Fixed: Lấy file hình ảnh từ input có id 'imageUpload' (phải khớp với HTML)
             const imageFile = document.getElementById('imageUpload').files[0];
             // Nếu người dùng đã chọn một file hình ảnh, thêm nó vào FormData để gửi lên server
             if (imageFile) {
@@ -53,7 +55,7 @@ function clearResponse() {
                 responseDiv.innerHTML = marked.parse(data);
                 // Render MathJax cho công thức toán học
                 MathJax.typeset();
-                // Xóa file đã chọn sau khi gửi thành công
+                // Fixed: Xóa file đã chọn sau khi gửi thành công - sử dụng 'imageUpload' đúng
                 document.getElementById('imageUpload').value = '';
             })
             // Nếu có lỗi xảy ra trong quá trình gửi request hoặc nhận phản hồi, chúng ta sẽ bắt lỗi và hiển thị thông báo lỗi cho người dùng
