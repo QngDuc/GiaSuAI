@@ -73,3 +73,56 @@ function clearResponse() {
                 responseDiv.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Lỗi: ' + error + '</div>';
             });
         });
+
+        // Xử lý Drag & Drop và Paste hình ảnh
+        const imageUpload = document.getElementById('imageUpload');
+        const questionForm = document.getElementById('questionForm');
+
+        // Drag & Drop
+        questionForm.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            questionForm.style.borderColor = '#e91e63';
+            questionForm.style.backgroundColor = 'rgba(233, 30, 99, 0.05)';
+        });
+
+        questionForm.addEventListener('dragleave', () => {
+            questionForm.style.borderColor = '#ddd';
+            questionForm.style.backgroundColor = 'transparent';
+        });
+
+        questionForm.addEventListener('drop', (e) => {
+            e.preventDefault();
+            questionForm.style.borderColor = '#ddd';
+            questionForm.style.backgroundColor = 'transparent';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                imageUpload.files = files;
+                // Hiển thị tên file đã kéo thả
+                const fileName = files[0].name;
+                const fileInput = document.querySelector('input[type="file"]');
+                if (fileInput.nextElementSibling?.classList.contains('file-name')) {
+                    fileInput.nextElementSibling.textContent = fileName;
+                }
+            }
+        });
+
+        // Copy/Paste hình ảnh từ Clipboard
+        document.addEventListener('paste', (e) => {
+            const items = e.clipboardData?.items;
+            if (!items) return;
+
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    // Tạo File object từ clipboard
+                    const file = item.getAsFile();
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    imageUpload.files = dataTransfer.files;
+                    
+                    // Hiển thị thông báo
+                    alert('✅ Đã paste hình ảnh từ clipboard!');
+                    break;
+                }
+            }
+        });
