@@ -1,128 +1,132 @@
-// hàm để xóa câu trả lời và reset form sau khi người dùng nhấn nút "Đặt câu hỏi khác"
+/**
+ * AI MentorPro - Logic điều khiển tương tác người dùng (Frontend).
+ * Được thiết kế để mang lại trải nghiệm cố vấn mượt mà, chuyên nghiệp.
+ */
+
+// Hàm khởi tạo lại trạng thái để tiếp nhận bài toán/dự án mới
 function clearResponse() {
-            // Lấy phần từ chứa responseContainer và ẩn nó đi
-            document.getElementById('responseContainer').style.display = 'none';
-            // Lấy phần tử chứa câu hỏi và hình ảnh, đưa giá trị của chúng về mặc định (rỗng) để người dùng có thể nhập câu hỏi mới và chọn hình ảnh mới nếu muốn
-            document.getElementById('question').value = '';
-            // Fixed: Sử dụng 'imageUpload' - ID chính xác của input file từ HTML
-            document.getElementById('imageUpload').value = '';
-            // Lấy phần tử chứa câu hỏi dùng để hiển thị lại và focus vào đó để người dùng có thể nhập câu hỏi mới
-            document.getElementById('question').focus();
+    // Ẩn khu vực kết quả cũ để người dùng tập trung vào câu hỏi mới
+    document.getElementById('responseContainer').style.display = 'none';
+    
+    // Reset toàn bộ dữ liệu đầu vào (Văn bản & Hình ảnh) về trạng thái sạch
+    document.getElementById('question').value = '';
+    document.getElementById('imageUpload').value = '';
+    
+    // Tự động đưa con trỏ vào ô nhập liệu - Tối ưu UX cho Mentee hành động ngay lập tức
+    document.getElementById('question').focus();
+}
+
+// Lắng nghe sự kiện gửi yêu cầu cố vấn từ Form
+document.getElementById('questionForm').addEventListener('submit', function(e) {
+    // Chặn tải lại trang (Single Page Experience) để giữ mạch cảm xúc của người dùng
+    e.preventDefault();
+    
+    const responseDiv = document.getElementById('response');
+    const responseContainer = document.getElementById('responseContainer');
+    
+    // FormData: "Chiếc túi thần kỳ" giúp đóng gói cả văn bản và tệp nhị phân gửi lên Server
+    const formData = new FormData();
+    formData.append('user_input', document.getElementById('question').value);
+    
+    const imageFile = document.getElementById('imageUpload').files[0];
+    
+    // Kiểm soát chất lượng đầu vào - Tránh làm quá tải hệ thống MentorPro
+    if (imageFile) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+        if (!allowedTypes.includes(imageFile.type)) {
+            alert('MentorPro chỉ tiếp nhận: Hình ảnh (JPEG, PNG, GIF, WebP) hoặc tài liệu PDF!');
+            return;
         }
-        // Lấy phần tử form câu hỏi và thêm sự kiện lắng nghe khi người dùng submit form
-        document.getElementById('questionForm').addEventListener('submit', function(e) {
-            // Ngăn chặn hành vi mặc định của form khi submit để chúng ta có thể xử lý bằng JavaScript
-            e.preventDefault();
+        // Giới hạn 5MB: Đảm bảo tốc độ truyền tải nhanh nhất cho hạ tầng mạng tại BMT
+        if (imageFile.size > 5 * 1024 * 1024) {
+            alert('Tệp tin quá lớn! Vui lòng giữ dưới 5MB để MentorPro xử lý nhanh nhất.');
+            return;
+        }
+        formData.append('file', imageFile);
+    }
+    
+    // Tạo trạng thái chờ chuyên nghiệp: Giúp Mentee an tâm rằng chuyên gia đang phân tích
+    responseDiv.innerHTML = `
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>AI MentorPro đang phân tích dữ liệu và soạn thảo chiến lược cho bạn...</p>
+        </div>`;
+    
+    responseContainer.style.display = 'block';
+    // Cuộn mượt mà đến vùng kết quả - Giúp giao diện trông hiện đại và cao cấp hơn
+    responseContainer.scrollIntoView({ behavior: 'smooth' });
+    
+    // AJAX/Fetch: Kết nối không đồng bộ với Backend (app.py)
+    fetch('/ask', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Sử dụng Marked.js để trình bày giải pháp dưới dạng Markdown đẹp mắt
+        responseDiv.innerHTML = marked.parse(data);
+        
+        // Kích hoạt MathJax: Đảm bảo các công thức thuật toán/toán học được hiển thị chuẩn xác
+        if (window.MathJax) {
+            MathJax.typeset();
+        }
+    })
+    .catch(error => {
+        // Xử lý ngoại lệ: Luôn thông báo lỗi một cách minh bạch cho người dùng
+        responseDiv.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i> 
+                MentorPro gặp gián đoạn: ${error} - Hãy kiểm tra lại kết nối!
+            </div>`;
+    });
+});
+
+/**
+ * Các tính năng nâng cao (Enhanced UX): 
+ * Giúp việc gửi dữ liệu nhanh chóng như một chuyên gia thực thụ.
+ */
+
+const imageUpload = document.getElementById('imageUpload');
+const questionForm = document.getElementById('questionForm');
+
+// Drag & Drop: Cho phép kéo thả ảnh trực tiếp vào khu vực MentorPro
+questionForm.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    questionForm.style.borderColor = '#079992'; // Màu xanh Emerald đặc trưng của MentorPro
+    questionForm.style.backgroundColor = 'rgba(7, 153, 146, 0.05)';
+});
+
+questionForm.addEventListener('dragleave', () => {
+    questionForm.style.borderColor = '#ddd';
+    questionForm.style.backgroundColor = 'transparent';
+});
+
+questionForm.addEventListener('drop', (e) => {
+    e.preventDefault();
+    questionForm.style.borderColor = '#ddd';
+    questionForm.style.backgroundColor = 'transparent';
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        imageUpload.files = files;
+        alert('✅ MentorPro đã tiếp nhận file của bạn qua phương thức kéo thả!');
+    }
+});
+
+// Clipboard Paste: Tính năng "thần thánh" giúp chụp màn hình lỗi và Paste trực tiếp (Ctrl+V)
+document.addEventListener('paste', (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let item of items) {
+        if (item.type.indexOf('image') !== -1) {
+            const file = item.getAsFile();
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            imageUpload.files = dataTransfer.files;
             
-            // Gán giá trị userInput là giá trị của trường input có id 'question' (câu hỏi của người dùng)
-            const responseDiv = document.getElementById('response');
-            // Gán giá trị responseContainer là phần tử có id 'responseContainer' để hiển thị câu trả lời sau khi nhận được từ server
-            const responseContainer = document.getElementById('responseContainer');
-            
-            // Tạo FormData object để gửi cả văn bản và file
-            const formData = new FormData();
-            // Dùng FormData để lấy giá trị của trường input có id 'question' và gán vào biến userInput
-            formData.append('user_input', document.getElementById('question').value);
-            // Fixed: Lấy file hình ảnh từ input có id 'imageUpload' (phải khớp với HTML)
-            const imageFile = document.getElementById('imageUpload').files[0];
-            // Nếu người dùng đã chọn một file hình ảnh, thêm nó vào FormData để gửi lên server
-            if (imageFile) {
-                // Kiểm tra loại file (hình ảnh hoặc PDF)
-                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
-                if (!allowedTypes.includes(imageFile.type)) {
-                    alert('Chỉ chấp nhận file hình ảnh (JPEG, PNG, GIF, WebP) hoặc PDF!');
-                    return;
-                }
-                // Kiểm tra kích thước file (max 5MB)
-                if (imageFile.size > 5 * 1024 * 1024) {
-                    alert('Kích thước file không được vượt quá 5MB!');
-                    return;
-                }
-                // Dùng FormData để thêm file hình ảnh vào formData với tên 'file' để server có thể nhận và xử lý nó sau này
-                formData.append('file', imageFile);
-            }
-            
-            // Hiển thị thông báo đang tải
-                // Gán giá trị innerHTML của responseDiv thành một phần tử HTML chứa thông báo đang tải và một spinner để người dùng biết rằng câu hỏi đang được xử lý
-            responseDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Vui lòng đợi 1 phút để gia sư AI trả lời câu hỏi của bạn...</p></div>';
-                // Hiển thị phần tử responseContainer để người dùng có thể thấy thông báo đang tải và sau này sẽ hiển thị câu trả lời
-            responseContainer.style.display = 'block';
-                // Cuộn trang xuống phần tử responseContainer để người dùng có thể thấy thông báo đang tải và sau này sẽ thấy câu trả lời một cách mượt mà
-            responseContainer.scrollIntoView({ behavior: 'smooth' });
-            
-            // Gửi AJAX request
-                // Sử dụng fetch API để gửi một POST request đến endpoint '/ask' trên server với dữ liệu formData chứa câu hỏi và hình ảnh (nếu có)
-            fetch('/ask', {
-                // Chỉ định phương thức là POST để gửi dữ liệu lên server
-                method: 'POST',
-                // Phần body của request sẽ là formData chứa câu hỏi và hình ảnh (nếu có) để server có thể nhận và xử lý nó
-                body: formData
-            })
-            // Khi nhận được phản hồi từ server, chuyển đổi nó thành text để có thể hiển thị dưới dạng HTML sau này
-            .then(response => response.text())
-            // Sau khi chuyển đổi thành text, chúng ta sẽ có dữ liệu câu trả lời từ server và có thể hiển thị nó cho người dùng
-            .then(data => {
-                // Parse Markdown và hiển thị kết quả
-                responseDiv.innerHTML = marked.parse(data);
-                // Render MathJax cho công thức toán học
-                MathJax.typeset();
-            })
-            // Nếu có lỗi xảy ra trong quá trình gửi request hoặc nhận phản hồi, chúng ta sẽ bắt lỗi và hiển thị thông báo lỗi cho người dùng
-            .catch(error => {
-                // Gán giá trị innerHTML của responseDiv thành một phần tử HTML chứa thông báo lỗi và biểu tượng cảnh báo để người dùng biết rằng đã có lỗi xảy ra trong quá trình xử lý câu hỏi
-                responseDiv.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Lỗi: ' + error + '</div>';
-            });
-        });
-
-        // Xử lý Drag & Drop và Paste hình ảnh
-        const imageUpload = document.getElementById('imageUpload');
-        const questionForm = document.getElementById('questionForm');
-
-        // Drag & Drop
-        questionForm.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            questionForm.style.borderColor = '#e91e63';
-            questionForm.style.backgroundColor = 'rgba(233, 30, 99, 0.05)';
-        });
-
-        questionForm.addEventListener('dragleave', () => {
-            questionForm.style.borderColor = '#ddd';
-            questionForm.style.backgroundColor = 'transparent';
-        });
-
-        questionForm.addEventListener('drop', (e) => {
-            e.preventDefault();
-            questionForm.style.borderColor = '#ddd';
-            questionForm.style.backgroundColor = 'transparent';
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                imageUpload.files = files;
-                // Hiển thị tên file đã kéo thả
-                const fileName = files[0].name;
-                const fileInput = document.querySelector('input[type="file"]');
-                if (fileInput.nextElementSibling?.classList.contains('file-name')) {
-                    fileInput.nextElementSibling.textContent = fileName;
-                }
-            }
-        });
-
-        // Copy/Paste hình ảnh từ Clipboard
-        document.addEventListener('paste', (e) => {
-            const items = e.clipboardData?.items;
-            if (!items) return;
-
-            for (let item of items) {
-                if (item.type.indexOf('image') !== -1) {
-                    // Tạo File object từ clipboard
-                    const file = item.getAsFile();
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    imageUpload.files = dataTransfer.files;
-                    
-                    // Hiển thị thông báo
-                    alert('✅ Đã paste hình ảnh từ clipboard!');
-                    break;
-                }
-            }
-        });
+            alert('✅ Đã dán (paste) bằng chứng hình ảnh thành công!');
+            break;
+        }
+    }
+});

@@ -3,105 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <title>AI MentorPro - Hệ thống Cố vấn Chiến lược</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script>
-        MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']]
-            },
-            svg: {
-                fontCache: 'global'
-            }
-        };
-    </script>
+    
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Gia sư AI - Trợ lý học tập thông minh</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-graduation-cap"></i> Gia sư AI
-            </a>
+
+    <div class="chat-container">
+        <header>
+            <h1>AI MentorPro <span>v2.0</span></h1>
+            <p style="text-align: center; opacity: 0.6; font-size: 0.85rem; margin-bottom: 20px;">
+                Cố vấn công nghệ & chiến lược từ BMT
+            </p>
+        </header>
+
+        <div id="chat-box" class="chat-box">
+            <div class="msg ai-msg">
+                Chào bạn! Tôi là MentorPro. Bạn cần tôi cố vấn về lộ trình công nghệ, review code hay chiến lược phát triển bền vững?
+            </div>
         </div>
-    </nav>
 
-    <main class="main-container">
-        <!-- Hero Section -->
-        <section class="hero-section">
-            <div class="hero-content">
-                <h1 class="hero-title">
-                    <i class="fas fa-robot"></i> Gia sư AI
-                </h1>
-                <p class="hero-subtitle">Trợ lý học tập thông minh - Sẵn sàng giúp bạn mọi lúc</p>
-                <div class="hero-decoration">
-                    <div class="float-particle"></div>
-                    <div class="float-particle"></div>
-                    <div class="float-particle"></div>
-                </div>
+        <div id="responseContainer" style="display: none;">
+            <div id="response" class="msg ai-msg"></div>
+            <div style="text-align: right; margin-top: 10px;">
+                <button onclick="clearResponse()" style="background: transparent; border: 1px solid var(--glass-border); color: var(--accent-cyan); padding: 5px 15px; border-radius: 15px; cursor: pointer; font-size: 0.8rem;">
+                    <i class="fas fa-plus"></i> Đặt câu hỏi mới
+                </button>
             </div>
-        </section>
+        </div>
 
-        <!-- Main Content -->
-        <section class="content-section">
-            <div class="container">
-                <!-- Question Form Card -->
-                <div class="form-container">
-                    <div class="form-card">
-                        <h2 class="form-title">
-                            <i class="fas fa-lightbulb"></i> Hãy đặt câu hỏi của bạn
-                        </h2>
-                        <p class="form-description">Nhập bất kỳ câu hỏi gì và tôi sẽ giúp bạn tìm ra câu trả lời</p>
-                        
-                        <form id="questionForm" class="question-form" enctype="multipart/form-data">
-                            <div class="input-group input-group-lg input-group-custom">
-                                <input 
-                                    type="text" 
-                                    class="form-control" 
-                                    id="question" 
-                                    name="user_input" 
-                                    placeholder="Ví dụ: Phương trình bậc hai là gì?..."
-                                    required
-                                >
-                                <!-- Fixed: Thay đổi id từ 'fileInput' thành 'imageUpload' để khớp với JavaScript -->
-                                <!-- Fixed: Sửa chính xác giá trị accept từ '.image/*' thành 'image/*' -->
-                                <input 
-                                    type="file" 
-                                    name="file"
-                                    id="imageUpload"
-                                    class="form-control file-input"
-                                    accept="image/*,.pdf,.doc,.docx,.txt">
-                                <button class="btn btn-primary btn-custom" type="submit">
-                                    <i class="fas fa-paper-plane"></i> Gửi
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Response Card -->
-                <div class="response-container" id="responseContainer" style="display: none;">
-                    <div class="response-card">
-                        <div class="response-header">
-                            <h3><i class="fas fa-check-circle"></i> Câu trả lời</h3>
-                            <button class="btn-clear" onclick="clearResponse()">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div id="response" class="response-content"></div>
-                    </div>
-                </div>
+        <form id="questionForm" enctype="multipart/form-data">
+            <div class="input-group">
+                <label for="imageUpload" class="file-label">
+                    <i class="fas fa-paperclip"></i>
+                </label>
+                <input type="file" id="imageUpload" name="file" accept="image/*,application/pdf" style="display: none;">
+                
+                <input type="text" id="question" name="user_input" placeholder="Mô tả dự án hoặc dán lỗi code vào đây..." required autocomplete="off">
+                
+                <button type="submit">
+                    <span>Gửi</span>
+                    <i class="fas fa-arrow-up"></i>
+                </button>
             </div>
-        </section>
-    </main>
+        </form>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <footer>
+            &copy; 2026 AI MentorPro Project. Hướng tới Công nghệ xanh & Phát triển bền vững.
+        </footer>
+    </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    </script>
 </body>
 </html>
